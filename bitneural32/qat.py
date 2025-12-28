@@ -112,16 +112,18 @@ class TernaryConv1D(keras.layers.Layer):
     def __init__(self, filters, kernel_size, strides=1, padding="same", activation=None, **kwargs):
         super().__init__(**kwargs)
         self.filters = int(filters)
-        self.kernel_size = int(kernel_size)
-        self.strides = int(strides)
+        # IMPORTANT: Store as tuples for Keras compatibility and compiler expectations
+        self.kernel_size = (int(kernel_size),)
+        self.strides = (int(strides),)
         self.padding = padding.lower()
         self.activation = keras.activations.get(activation)
 
     def build(self, input_shape):
         in_channels = int(input_shape[-1])
+        k = self.kernel_size[0]
         self.w = self.add_weight(
             name="kernel",
-            shape=(self.kernel_size, in_channels, self.filters),
+            shape=(k, in_channels, self.filters),
             initializer=keras.initializers.RandomUniform(-0.1, 0.1),
             trainable=True,
         )
