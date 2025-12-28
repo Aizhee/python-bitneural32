@@ -101,7 +101,7 @@ Output example:
 Include the generated header in your C firmware:
 
 ```c
-#include "bitneural.h"
+#include "BitNeural32.h"
 #include "model_data.h"
 
 void app_main() {
