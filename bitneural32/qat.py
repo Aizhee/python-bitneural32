@@ -56,8 +56,7 @@ Notes:
 """
 
 import keras
-import keras.ops as ops
-import keras.backend as K
+from keras import ops
 import numpy as np
 
 @keras.utils.register_keras_serializable()
@@ -65,7 +64,7 @@ def ternary_quantize(w):
     """Ternary quantization with learnable scale alpha (mean abs) and STE.
 
     Maps weights to {-1, 0, 1} scaled by alpha:
-        alpha = mean(|w|)
+        alpha = ops.mean(ops.abs(w))
         threshold = 0.7 * alpha
         w_ternary = sign(w) where |w| >= threshold else 0
         w_q = alpha * w_ternary
@@ -138,7 +137,7 @@ class TernaryConv1D(keras.layers.Layer):
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
-        y = ops.conv1d(
+        y = ops.conv(
             x,
             w_q,
             strides=self.strides,

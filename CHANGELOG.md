@@ -2,7 +2,7 @@
 
 All notable changes to BitNeural32 are documented in this file.
 
-## [0.0.4-0.0.5] - 2025-12-28
+## [0.0.4-0.0.7] - 2025-12-28
 - **QAT Fixes**
 
 ## [0.0.3] - 2025-12-28
