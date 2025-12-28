@@ -2,6 +2,12 @@
 
 All notable changes to BitNeural32 are documented in this file.
 
+## [0.0.4] - 2025-12-28
+- **QAT Fixes**
+
+## [0.0.3] - 2025-12-28
+- **Update Path fix**
+
 ## [0.0.2] - 2025-12-28
 - **Update Readme**
 

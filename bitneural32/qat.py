@@ -57,11 +57,12 @@ Notes:
 
 import keras
 import keras.ops as ops
+import keras.backend as K
 import numpy as np
 
 @keras.utils.register_keras_serializable()
 def ternary_quantize(w):
-    """Ternary quantization with learnable scale alpha (mean abs).
+    """Ternary quantization with learnable scale alpha (mean abs) and STE.
 
     Maps weights to {-1, 0, 1} scaled by alpha:
         alpha = mean(|w|)
@@ -69,7 +70,8 @@ def ternary_quantize(w):
         w_ternary = sign(w) where |w| >= threshold else 0
         w_q = alpha * w_ternary
 
-    Gradient: straight-through estimator (STE)
+    Gradient: straight-through estimator (STE) - gradients pass through as identity,
+    improving training stability by allowing gradient flow through quantization.
     """
     alpha = ops.mean(ops.abs(w))
     threshold = 0.7 * alpha
@@ -81,6 +83,11 @@ def ternary_quantize(w):
     )
 
     w_q = alpha * w_ternary
+    
+    # STE: forward pass uses quantized weights, but gradient flows through as identity
+    # This prevents gradient starvation that would occur from sign() step function
+    w_q = w + ops.stop_gradient(w_q - w)
+    
     return w_q
 
 
@@ -103,12 +110,13 @@ class TernaryConv1D(keras.layers.Layer):
     - Warns if input has multiple channels
     - For multi-channel: reshape to (batch, height, width) and use Conv2D instead
     """
-    def __init__(self, filters, kernel_size, strides=1, padding="same", **kwargs):
+    def __init__(self, filters, kernel_size, strides=1, padding="same", activation=None, **kwargs):
         super().__init__(**kwargs)
         self.filters = int(filters)
         self.kernel_size = int(kernel_size)
         self.strides = int(strides)
-        self.padding = padding.upper()
+        self.padding = padding.lower()
+        self.activation = keras.activations.get(activation)
 
     def build(self, input_shape):
         in_channels = int(input_shape[-1])
@@ -130,13 +138,16 @@ class TernaryConv1D(keras.layers.Layer):
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
-        y = ops.conv1d(
+        y = K.conv1d(
             x,
             w_q,
             strides=self.strides,
             padding=self.padding
         )
-        return y + self.b
+        y = y + self.b
+        if self.activation is not None:
+            y = self.activation(y)
+        return y
 
 
 class TernaryDense(keras.layers.Layer):
@@ -152,9 +163,10 @@ class TernaryDense(keras.layers.Layer):
     
     Exports to same C bytecode format via BitNeuralCompiler.
     """
-    def __init__(self, units, **kwargs):
+    def __init__(self, units, activation=None, **kwargs):
         super().__init__(**kwargs)
         self.units = int(units)
+        self.activation = keras.activations.get(activation)
 
     def build(self, input_shape):
         in_dim = int(input_shape[-1])
@@ -172,7 +184,10 @@ class TernaryDense(keras.layers.Layer):
         )
 
     def call(self, x):
-        return ops.matmul(x, ternary_quantize(self.w)) + self.b
+        y = K.dot(x, ternary_quantize(self.w)) + self.b
+        if self.activation is not None:
+            y = self.activation(y)
+        return y
 
 
 class TernaryConv2D(keras.layers.Layer):
@@ -184,7 +199,7 @@ class TernaryConv2D(keras.layers.Layer):
     
     Exports to same C bytecode format via BitNeuralCompiler.
     """
-    def __init__(self, filters, kernel_size, strides=1, padding="same", **kwargs):
+    def __init__(self, filters, kernel_size, strides=1, padding="same", activation=None, **kwargs):
         super().__init__(**kwargs)
         self.filters = int(filters)
         if isinstance(kernel_size, (list, tuple)):
@@ -197,7 +212,8 @@ class TernaryConv2D(keras.layers.Layer):
         else:
             s = int(strides)
             self.strides = (s, s)
-        self.padding = padding.upper()
+        self.padding = padding.lower()
+        self.activation = keras.activations.get(activation)
 
     def build(self, input_shape):
         in_channels = int(input_shape[-1])
@@ -216,13 +232,16 @@ class TernaryConv2D(keras.layers.Layer):
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
-        y = ops.conv2d(
+        y = K.conv2d(
             x,
             w_q,
             strides=self.strides,
             padding=self.padding
         )
-        return y + self.b
+        y = y + self.b
+        if self.activation is not None:
+            y = self.activation(y)
+        return y
 
 
 class TernaryLSTM(keras.layers.Layer):
