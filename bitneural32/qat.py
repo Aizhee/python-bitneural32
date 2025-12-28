@@ -138,7 +138,7 @@ class TernaryConv1D(keras.layers.Layer):
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
-        y = K.conv1d(
+        y = ops.conv1d(
             x,
             w_q,
             strides=self.strides,
@@ -184,7 +184,7 @@ class TernaryDense(keras.layers.Layer):
         )
 
     def call(self, x):
-        y = K.dot(x, ternary_quantize(self.w)) + self.b
+        y = ops.matmul(x, ternary_quantize(self.w)) + self.b
         if self.activation is not None:
             y = self.activation(y)
         return y
@@ -232,7 +232,7 @@ class TernaryConv2D(keras.layers.Layer):
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
-        y = K.conv2d(
+        y = ops.conv2d(
             x,
             w_q,
             strides=self.strides,
