@@ -308,15 +308,6 @@ model_data.h (ready for ESP32 inclusion)
 - **Use dual-core**: Enable Core 1 for real-time audio/sensor processing
 - **Monitor UART**: Check inference logs for bottlenecks
 
-## Examples
-
-Complete examples available in the [GitHub repository](https://github.com/yourusername/bitneural32):
-
-- `examples/mnist_qat.py` - MNIST classification with QAT
-- `examples/audio_keyword_spotting.py` - Keyword spotting on audio
-- `examples/time_series_forecasting.py` - LSTM forecasting
-- `examples/esp32_firmware.c` - Complete ESP32 implementation
-
 ## Troubleshooting
 
 ### "Unsupported layer type"
