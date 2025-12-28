@@ -1,5 +1,6 @@
 build.bat
-py-lib/dist/
+dist/
+bitneural32.egg-info/
 __pycache__/
 *.pyc
 *.pyo

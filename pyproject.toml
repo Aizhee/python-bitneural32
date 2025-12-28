@@ -2,10 +2,9 @@
 name = "bitneural32"
 version = "0.0.1"
 description = "BitNeural32: 1.58-bit Ternary Neural Network Compiler & QAT Library for ESP32"
-long-description = {file = "README.md", content-type = "text/markdown"}
+readme = "README.md"
 authors = [{name = "Aizhee", email = "aizharjamilano@gmail.com"}]
 maintainers = [{name = "Aizhee", email = "aizharjamilano@gmail.com"}]
-readme = "README.md"
 requires-python = ">=3.9,<4"
 license = {text = "MIT"}
 keywords = ["ternary", "neural-network", "ESP32", "bitnet", "quantization", "embedded-ml", "qat"]
@@ -23,9 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
-homepage = "https://github.com/Aizhee/python-bitneural32"
-repository = "https://github.com/Aizhee/python-bitneural32.git"
-documentation = "https://github.com/Aizhee/python-bitneural32/wiki"
+urls = { "Homepage" = "https://github.com/Aizhee/python-bitneural32", "Repository" = "https://github.com/Aizhee/python-bitneural32.git", "Documentation" = "https://github.com/Aizhee/python-bitneural32/wiki" }
 
 dependencies = [
     "keras>=3.0.0",
