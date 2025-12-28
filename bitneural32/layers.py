@@ -1,8 +1,8 @@
 from typing import List, Tuple
 import struct
 import numpy as np
-from quantize import quantize_weights_ternary, pack_weights_2bit
-from op_codes import (OP_INPUT_NORM, OP_CONV1D_TERNARY, OP_DENSE_TERNARY,
+from bitneural32.quantize import quantize_weights_ternary, pack_weights_2bit
+from bitneural32.op_codes import (OP_INPUT_NORM, OP_CONV1D_TERNARY, OP_DENSE_TERNARY,
                       OP_CONV2D_TERNARY, OP_RELU, OP_LEAKY_RELU, OP_SOFTMAX,
                       OP_SIGMOID, OP_TANH, OP_MAXPOOL_1D, OP_AVGPOOL_1D, OP_FLATTEN,
                       OP_DROPOUT, OP_BATCH_NORM, OP_LSTM, OP_GRU, OP_CUSTOM)

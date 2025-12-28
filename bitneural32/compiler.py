@@ -19,11 +19,11 @@ import io
 from typing import Dict, Optional, Tuple
 import json
 import time
-from layers import (DenseCompiler, Conv1DCompiler,
+from bitneural32.layers import (DenseCompiler, Conv1DCompiler,
                     Conv2DCompiler, ReLuCompiler, LeakyReLuCompiler,
                     SoftmaxCompiler, FlattenCompiler, MaxPooling1DCompiler,
                     DropoutCompiler, LSTMCompiler, GRUCompiler)
-from op_codes import (OP_INPUT_NORM, OP_LSTM, OP_GRU)
+from bitneural32.op_codes import (OP_INPUT_NORM, OP_LSTM, OP_GRU)
 try:
     import keras
     HAS_KERAS = True
