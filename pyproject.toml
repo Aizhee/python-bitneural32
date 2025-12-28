@@ -1,11 +1,11 @@
 [project]
 name = "bitneural32"
-version = "0.0.4"
+version = "0.0.5"
 description = "BitNeural32: 1.58-bit Ternary Neural Network Compiler & QAT Library for ESP32"
 readme = "README.md"
 authors = [{name = "Aizhee", email = "aizharjamilano@gmail.com"}]
 maintainers = [{name = "Aizhee", email = "aizharjamilano@gmail.com"}]
-requires-python = ">=3.9,<4"
+requires-python = ">=3.9"
 license = {text = "MIT"}
 keywords = ["ternary", "neural-network", "ESP32", "bitnet", "quantization", "embedded-ml", "qat"]
 classifiers = [
