@@ -119,21 +119,22 @@ class TernaryConv1D(keras.layers.Layer):
 
     def build(self, input_shape):
         in_channels = int(input_shape[-1])
-        # BitNeural32 Conv1D expects single-channel; enforce for compatibility
-        if in_channels != 1:
-            print(f"[WARN] TernaryConv1D is optimized for single-channel input (got {in_channels})")
         self.w = self.add_weight(
+            name="kernel",
             shape=(self.kernel_size, in_channels, self.filters),
             initializer=keras.initializers.RandomUniform(-0.1, 0.1),
             trainable=True,
-            name="w"
         )
         self.b = self.add_weight(
+            name="bias",
             shape=(self.filters,),
             initializer="zeros",
             trainable=True,
-            name="b"
         )
+        
+        # Compiler compatibility: expose Keras-standard aliases
+        self.kernel = self.w
+        self.bias = self.b
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
@@ -170,17 +171,21 @@ class TernaryDense(keras.layers.Layer):
     def build(self, input_shape):
         in_dim = int(input_shape[-1])
         self.w = self.add_weight(
+            name="kernel",
             shape=(in_dim, self.units),
             initializer=keras.initializers.RandomUniform(-0.1, 0.1),
             trainable=True,
-            name="w"
         )
         self.b = self.add_weight(
+            name="bias",
             shape=(self.units,),
             initializer="zeros",
             trainable=True,
-            name="b"
         )
+        
+        # Compiler compatibility: expose Keras-standard aliases
+        self.kernel = self.w
+        self.bias = self.b
 
     def call(self, x):
         y = ops.matmul(x, ternary_quantize(self.w)) + self.b
@@ -217,17 +222,21 @@ class TernaryConv2D(keras.layers.Layer):
     def build(self, input_shape):
         in_channels = int(input_shape[-1])
         self.w = self.add_weight(
+            name="kernel",
             shape=(*self.kernel_size, in_channels, self.filters),
             initializer=keras.initializers.RandomUniform(-0.1, 0.1),
             trainable=True,
-            name="w"
         )
         self.b = self.add_weight(
+            name="bias",
             shape=(self.filters,),
             initializer="zeros",
             trainable=True,
-            name="b"
         )
+        
+        # Compiler compatibility: expose Keras-standard aliases
+        self.kernel = self.w
+        self.bias = self.b
 
     def call(self, x):
         w_q = ternary_quantize(self.w)
