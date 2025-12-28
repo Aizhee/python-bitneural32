@@ -1,0 +1,8 @@
+build.bat
+py-lib/dist/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
