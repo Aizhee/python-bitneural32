@@ -23,9 +23,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
-homepage = "https://github.com/yourusername/bitneural32"
-repository = "https://github.com/yourusername/bitneural32.git"
-documentation = "https://github.com/yourusername/bitneural32/wiki"
+homepage = "https://github.com/Aizhee/python-bitneural32"
+repository = "https://github.com/Aizhee/python-bitneural32.git"
+documentation = "https://github.com/Aizhee/python-bitneural32/wiki"
 
 dependencies = [
     "keras>=3.0.0",
