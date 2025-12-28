@@ -361,7 +361,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 ## References
 
 - **BitNet Paper**: [arxiv.org/abs/2310.11453](https://arxiv.org/abs/2310.11453)
-- **Ternary Networks**: [arxiv.org/abs/1605.01740](https://arxiv.org/abs/1605.01740)
+- **Ternary Networks**: [arxiv.org/abs/1609.00222](https://arxiv.org/abs/1609.00222)
 - **ESP32 Docs**: [docs.espressif.com](https://docs.espressif.com)
 - **Keras API**: [keras.io](https://keras.io)
 
