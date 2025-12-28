@@ -2,6 +2,9 @@
 
 All notable changes to BitNeural32 are documented in this file.
 
+## [0.0.2] - 2025-12-28
+- **Update Readme**
+
 ## [0.0.1] - 2025-12-28
 
 ### Features

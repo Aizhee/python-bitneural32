@@ -1,6 +1,6 @@
 [project]
 name = "bitneural32"
-version = "0.0.1"
+version = "0.0.2"
 description = "BitNeural32: 1.58-bit Ternary Neural Network Compiler & QAT Library for ESP32"
 readme = "README.md"
 authors = [{name = "Aizhee", email = "aizharjamilano@gmail.com"}]
