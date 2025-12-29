@@ -11,7 +11,7 @@ KEY DISTINCTION: QAT Layers vs Standard Keras Layers
 =====================================================
 
 Standard Keras Layers:
-  - Conv1D, Conv2D, Dense, LSTM, GRU from keras.layers
+  - Conv (formerly Conv1D), Conv2D, Dense, LSTM, GRU from keras.layers
   - Weights are floating-point during training
   - Quantization applied AFTER training (post-training quantization)
   - Simpler workflow; lower accuracy after quantization
