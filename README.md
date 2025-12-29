@@ -98,22 +98,7 @@ Output example:
 
 ### 3. Run on ESP32
 
-Include the generated header in your C firmware:
-
-```c
-#include "BitNeural32.h"
-#include "model_data.h"
-
-void app_main() {
-    bn_init();  // Register all kernels
-    
-    float input[100] = {...};
-    float output[10];
-    
-    bn_run_inference(model_data, input, output);
-    printf("Prediction: %d\n", argmax(output, 10));
-}
-```
+> Learn more at [Deployment Guide](https://github.com/Aizhee/arduino-bitneural32/blob/main/README.md#usage-guide)
 
 ## API Reference
 
