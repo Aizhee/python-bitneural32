@@ -2,6 +2,9 @@
 
 All notable changes to BitNeural32 are documented in this file.
 
+## [0.0.11] - 2026-02-08
+- **QoL: Remove Warning for Input layer not being compiled**
+
 ## [0.0.10] - 2026-02-08
 - **BUGFIX: Fixed reading custom QAT layers**
 

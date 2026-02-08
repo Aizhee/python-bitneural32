@@ -105,17 +105,9 @@ class BitNeuralCompiler:
         self.output_shape = None
     
     def compile_model(self, model: 'keras.Model', input_data: Optional[np.ndarray] = None,
-                     allow_metrics: bool = False) -> str:
+                      allow_metrics: bool = False) -> str:
         """
         Compile a Keras model to C header with optional metrics.
-        
-        Args:
-            model: Keras model to compile
-            input_data: Optional training data for normalization statistics
-            allow_metrics: If True, generate inference metrics
-        
-        Returns:
-            C header string (const uint8_t model_data[] = {...};)
         """
         self.model = model
         self.layers_compiled = []
@@ -151,6 +143,9 @@ class BitNeuralCompiler:
         for keras_layer in model.layers:
             layer_type = type(keras_layer).__name__
             
+            if layer_type == 'InputLayer':
+                continue
+
             if layer_type not in self.LAYER_COMPILER_MAP:
                 print(f"[WARNING] Unsupported layer type: {layer_type}. Skipping.")
                 continue
