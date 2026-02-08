@@ -2,6 +2,9 @@
 
 All notable changes to BitNeural32 are documented in this file.
 
+## [0.0.10] - 2026-02-08
+- **BUGFIX: Fixed reading custom QAT layers**
+
 ## [0.0.4-0.0.9] - 2025-12-28
 - **QAT Fixes**
 
