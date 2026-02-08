@@ -90,6 +90,7 @@ def ternary_quantize(w):
     return w_q
 
 
+@keras.saving.register_keras_serializable(package="bitneural32")
 class TernaryConv1D(keras.layers.Layer):
     """
     Quantization-Aware Training (QAT) Conv1D Layer.
@@ -150,8 +151,20 @@ class TernaryConv1D(keras.layers.Layer):
         if self.activation is not None:
             y = self.activation(y)
         return y
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'filters': self.filters,
+            'kernel_size': self.kernel_size[0],
+            'strides': self.strides[0],
+            'padding': self.padding,
+            'activation': keras.activations.serialize(self.activation),
+        })
+        return config
 
 
+@keras.saving.register_keras_serializable(package="bitneural32")
 class TernaryDense(keras.layers.Layer):
     """
     Quantization-Aware Training (QAT) Dense Layer.
@@ -194,8 +207,17 @@ class TernaryDense(keras.layers.Layer):
         if self.activation is not None:
             y = self.activation(y)
         return y
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'units': self.units,
+            'activation': keras.activations.serialize(self.activation),
+        })
+        return config
 
 
+@keras.saving.register_keras_serializable(package="bitneural32")
 class TernaryConv2D(keras.layers.Layer):
     """
     Quantization-Aware Training (QAT) Conv2D Layer.
@@ -252,8 +274,20 @@ class TernaryConv2D(keras.layers.Layer):
         if self.activation is not None:
             y = self.activation(y)
         return y
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'filters': self.filters,
+            'kernel_size': self.kernel_size,
+            'strides': self.strides,
+            'padding': self.padding,
+            'activation': keras.activations.serialize(self.activation),
+        })
+        return config
 
 
+@keras.saving.register_keras_serializable(package="bitneural32")
 class TernaryLSTM(keras.layers.Layer):
     """
     Quantization-Aware Training (QAT) LSTM Layer.
@@ -310,8 +344,17 @@ class TernaryLSTM(keras.layers.Layer):
             return ops.stack(outputs, axis=1)
         else:
             return outputs[-1]
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'units': self.units,
+            'return_sequences': self.return_sequences,
+        })
+        return config
 
 
+@keras.saving.register_keras_serializable(package="bitneural32")
 class TernaryGRU(keras.layers.Layer):
     """
     Quantization-Aware Training (QAT) GRU Layer.
@@ -366,3 +409,11 @@ class TernaryGRU(keras.layers.Layer):
             return ops.stack(outputs, axis=1)
         else:
             return outputs[-1]
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'units': self.units,
+            'return_sequences': self.return_sequences,
+        })
+        return config
