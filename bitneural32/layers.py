@@ -2,7 +2,7 @@ from typing import List, Tuple
 import struct
 import numpy as np
 from bitneural32.quantize import quantize_weights_ternary, pack_weights_2bit
-from bitneural32.op_codes import (OP_INPUT_NORM, OP_CONV1D_TERNARY, OP_DENSE_TERNARY,
+from bitneural32.op_codes import (OP_INPUT_NORM, OP_CONV1D_TERNARY, OP_DENSE_TERNARY, OP_DENSE_FLOAT,
                       OP_CONV2D_TERNARY, OP_RELU, OP_LEAKY_RELU, OP_SOFTMAX,
                       OP_SIGMOID, OP_TANH, OP_MAXPOOL_1D, OP_AVGPOOL_1D, OP_FLATTEN,
                       OP_DROPOUT, OP_BATCH_NORM, OP_LSTM, OP_GRU, OP_CUSTOM)
@@ -60,6 +60,34 @@ class DenseCompiler(LayerCompiler):
                 blob.extend(struct.pack('<f', b))
         
         return OP_DENSE_TERNARY, blob
+
+
+class RegularDenseCompiler(LayerCompiler):
+    """Compile regular (unquantized) Dense layers for precise output."""
+    
+    def compile(self, layer) -> Tuple[int, bytearray]:
+        weights = layer.kernel.numpy()  # Shape: (input_dim, units)
+        bias = layer.bias.numpy() if layer.bias is not None else None
+        
+        # Build parameter blob with FLOAT32 weights (no quantization)
+        blob = bytearray()
+        
+        # 1. Units (int32)
+        units = weights.shape[1]
+        blob.extend(struct.pack('<i', units))
+        
+        # 2. Weights as float32 (row-major layout: input_dim x units)
+        # Layout: [out0_in0, out0_in1, ..., out0_in_last, out1_in0, ...]
+        weight_matrix_size = weights.shape[0] * weights.shape[1]
+        for w in weights.flatten():  # Row-major flatten (C-order)
+            blob.extend(struct.pack('<f', w))
+        
+        # 3. Bias (optional, float32 per unit)
+        if bias is not None:
+            for b in bias:
+                blob.extend(struct.pack('<f', b))
+        
+        return OP_DENSE_FLOAT, blob
 
 
 class Conv1DCompiler(LayerCompiler):
@@ -324,3 +352,48 @@ class GRUCompiler(LayerCompiler):
                 blob.extend(struct.pack('<f', 0.0))
         
         return OP_GRU, blob
+
+
+class BatchNormCompiler(LayerCompiler):
+    """Compile BatchNormalization layers for activation normalization."""
+    
+    def compile(self, layer) -> Tuple[int, bytearray]:
+        """
+        BatchNorm parameters: [channels][gamma][beta][running_mean][running_variance]
+        
+        Normalizes input as: y = gamma * (x - running_mean) / sqrt(running_var + eps) + beta
+        """
+        # Extract batch norm parameters
+        gamma = layer.gamma.numpy() if layer.gamma is not None else None
+        beta = layer.beta.numpy() if layer.beta is not None else None
+        moving_mean = layer.moving_mean.numpy() if layer.moving_mean is not None else None
+        moving_variance = layer.moving_variance.numpy() if layer.moving_variance is not None else None
+        
+        if gamma is None or moving_mean is None or moving_variance is None:
+            raise ValueError("BatchNormalization layer missing required parameters")
+        
+        channels = int(gamma.shape[0])
+        
+        # Build parameter blob
+        blob = bytearray()
+        
+        # 1. Number of channels (int32)
+        blob.extend(struct.pack('<i', channels))
+        
+        # 2. Gamma (scale) - float32 per channel
+        for g in gamma:
+            blob.extend(struct.pack('<f', g))
+        
+        # 3. Beta (offset) - float32 per channel
+        for b in (beta if beta is not None else np.zeros(channels)):
+            blob.extend(struct.pack('<f', b))
+        
+        # 4. Running mean - float32 per channel
+        for m in moving_mean:
+            blob.extend(struct.pack('<f', m))
+        
+        # 5. Running variance - float32 per channel
+        for v in moving_variance:
+            blob.extend(struct.pack('<f', v))
+        
+        return OP_BATCH_NORM, blob

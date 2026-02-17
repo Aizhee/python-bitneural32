@@ -19,11 +19,12 @@ import io
 from typing import Dict, Optional, Tuple
 import json
 import time
-from bitneural32.layers import (DenseCompiler, Conv1DCompiler,
+from bitneural32.layers import (DenseCompiler, RegularDenseCompiler, Conv1DCompiler,
                     Conv2DCompiler, ReLuCompiler, LeakyReLuCompiler,
                     SoftmaxCompiler, FlattenCompiler, MaxPooling1DCompiler,
-                    DropoutCompiler, LSTMCompiler, GRUCompiler)
-from bitneural32.op_codes import (OP_INPUT_NORM, OP_LSTM, OP_GRU)
+                    DropoutCompiler, LSTMCompiler, GRUCompiler, BatchNormCompiler)
+from bitneural32.op_codes import (OP_INPUT_NORM, OP_LSTM, OP_GRU, OP_RELU, OP_LEAKY_RELU, 
+                      OP_SOFTMAX, OP_SIGMOID, OP_TANH)
 try:
     import keras
     HAS_KERAS = True
@@ -70,7 +71,7 @@ class BitNeuralCompiler:
     """
     
     LAYER_COMPILER_MAP = {
-        'Dense': DenseCompiler,
+        'Dense': RegularDenseCompiler,
         'TernaryDense': DenseCompiler,
         'Conv1D': Conv1DCompiler,
         'TernaryConv1D': Conv1DCompiler,
@@ -79,6 +80,7 @@ class BitNeuralCompiler:
         'ReLU': ReLuCompiler,
         'LeakyReLU': LeakyReLuCompiler,
         'Softmax': SoftmaxCompiler,
+        'BatchNormalization': BatchNormCompiler,
         'Flatten': FlattenCompiler,
         'MaxPooling1D': MaxPooling1DCompiler,
         'Dropout': DropoutCompiler,
@@ -140,6 +142,15 @@ class BitNeuralCompiler:
         # 4. Compile each Keras layer
         num_compiled_layers = 1
         
+        # Activation name to opcode mapping
+        activation_map = {
+            'relu': OP_RELU,
+            'leaky_relu': OP_LEAKY_RELU,
+            'softmax': OP_SOFTMAX,
+            'sigmoid': OP_SIGMOID,
+            'tanh': OP_TANH,
+        }
+        
         for keras_layer in model.layers:
             layer_type = type(keras_layer).__name__
             
@@ -162,6 +173,21 @@ class BitNeuralCompiler:
                 
                 self.layers_compiled.append((layer_type, opcode, len(param_blob)))
                 num_compiled_layers += 1
+                
+                # Check for activation function on this layer
+                if hasattr(keras_layer, 'activation') and keras_layer.activation is not None:
+                    activation_name = keras_layer.activation.__name__ if hasattr(keras_layer.activation, '__name__') else str(keras_layer.activation)
+                    
+                    # Only add activation if it's not 'linear' (the default/identity)
+                    if activation_name != 'linear' and activation_name in activation_map:
+                        act_opcode = activation_map[activation_name]
+                        layer_data.append(act_opcode)
+                        layer_data.extend(struct.pack('<i', 0))  # No parameters for activation layers
+                        self.layers_compiled.append((activation_name, act_opcode, 0))
+                        num_compiled_layers += 1
+                        print(f"[INFO] Added {activation_name} activation after {layer_type}")
+                    elif activation_name != 'linear':
+                        print(f"[WARNING] Unsupported activation: {activation_name}. Skipping.")
                 
             except Exception as e:
                 print(f"[ERROR] Failed to compile {layer_type}: {e}")

@@ -22,10 +22,10 @@ Quick Start:
     >>> compiler.compile_model(model)
     >>> compiler.save_c_header('model_data.h')
 
-See https://github.com/yourusername/bitneural32 for documentation.
+See https://github.com/Aizhee/python-bitneural32 for documentation.
 """
 
-__version__ = "3.0.0"
+__version__ = "0.0.15"
 __author__ = "Aizhee"
 __email__ = "aizharjamilano@gmail.com"
 __license__ = "MIT"
